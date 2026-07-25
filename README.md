@@ -18,17 +18,9 @@ This project automates that entire loop: clean the raw data, detect anomalies ea
 
 ## 🏗️ Architecture
 
-One **Master Orchestrator** workflow chains five sub-workflows end to end, triggered with a single click:
+One **Master Orchestrator** workflow chains five sub-workflows end to end, triggered with a single click: Ingestion → Cleaning → SQL Load → Anomaly Detection → Email Alerts.
 
-```
-Master Orchestrator
-   │
-   ├── WF1 — Data Ingestion
-   ├── WF2 — Data Cleaning
-   ├── WF3 — SQL Load
-   ├── WF4 — Anomaly Detection
-   └── WF5 — Email Alerts
-```
+## 🏗️ Pipeline in Action
 
 | Workflow | Purpose | Output |
 |---|---|---|
@@ -37,6 +29,36 @@ Master Orchestrator
 | **WF3 — SQL Load** | Writes cleaned data into Neon Postgres (`wind_turbine_data_v2`) using a TRUNCATE-before-INSERT pattern for idempotent full refresh | — |
 | **WF4 — Anomaly Detection** | Applies rule-based thresholds across four categories — Performance, Thermal, Grid, Mechanical — each with Warning/Critical tiers | Writes to `Turbine_Anomaly_Log_v2` (~1,933 NORMAL / 1,658 CRITICAL / 475 WARNING) |
 | **WF5 — Email Alerts** | Pulls the latest batch (last 18 rows ≈ one 3-hour Power BI refresh cycle), groups by severity, and uses a Groq LLM call to write a natural-language summary sentence before sending a formatted email alert | Gmail draft/send |
+
+Below are screenshots of the Master Orchestrator and individual n8n workflows, showing the pipeline running end to end.
+
+**Master Orchestrator — full pipeline run**
+![Master Orchestrator](<img width="1721" height="482" alt="Master Workflow" src="https://github.com/user-attachments/assets/23c55a70-b4eb-4339-be28-b9e244b97d45" />
+)
+
+**WF1 — Data Ingestion**
+![WF1 Ingestion](<img width="1580" height="527" alt="Data Ingestion" src="https://github.com/user-attachments/assets/e6ec59d2-3584-448b-a0b9-811dafc48ac7" />
+)
+
+**WF2 — Data Cleaning**
+![WF2 Cleaning](<img width="1827" height="541" alt="Data Cleaning   Validation" src="https://github.com/user-attachments/assets/399e800d-6484-4810-b09e-3cfabec6759b" />
+)
+
+**WF3 — SQL Load**
+![WF3 SQL Load](<img width="1372" height="392" alt="SQL Data load" src="https://github.com/user-attachments/assets/bc7b90a9-0700-44b5-a0ac-a4e59e17d32a" />
+)
+
+**WF4 — Anomaly Detection**
+![WF4 Anomaly Detection](<img width="1627" height="600" alt="Anomaly Detection" src="https://github.com/user-attachments/assets/8e75ba32-973f-429a-9be7-32c55954a47e" />
+)
+
+**WF5 — Email Alerts**
+![WF5 Email Alerts](<img width="1780" height="636" alt="Email Alert" src="https://github.com/user-attachments/assets/c674df32-9e69-4922-8c70-aca6dc51de2f" />
+)
+
+**Sample of Email alert**
+![Email Alert sample](<img width="727" height="662" alt="sample for email draft" src="https://github.com/user-attachments/assets/ce954d79-4028-4f2c-bb10-768d83c12586" />)
+
 
 ---
 
@@ -67,6 +89,18 @@ Two dashboards, deliberately no more — built on a join of the cleaned telemetr
 
 Published to Power BI Service with automatic refresh every 3 hours — decoupled from the n8n pipeline, with WF5's alert email covering urgency in between refreshes.
 
+**Screenshots of Power BI dashboards**
+![Performance Dashboard](<img width="1337" height="762" alt="Performance dashboard" src="https://github.com/user-attachments/assets/121ce7e0-5de9-437f-a678-155e33b82460" />
+)
+
+![Performance Trends Dashboard](<img width="1345" height="760" alt="Performance Trends dashboard" src="https://github.com/user-attachments/assets/7dbd7249-504d-47d0-a5e5-996d0eecb00e" />
+)
+
+![Anomaly Detection](<img width="1627" height="600" alt="Anomaly Detection" src="https://github.com/user-attachments/assets/cd70ca0d-026b-4b15-8845-e504ffe0aabe" />
+)
+
+![Anomaly Log dashboard](<img width="1342" height="775" alt="Anomaly Log dashboard" src="https://github.com/user-attachments/assets/d877d2e4-0294-4a11-ba61-57ae92801946" />
+)
 ---
 
 ## 🧠 Key Engineering Decisions
@@ -83,25 +117,30 @@ Published to Power BI Service with automatic refresh every 3 hours — decoupled
 ```
 DataWeave-Analytics/
 ├── README.md
-├── workflows/              # n8n workflow exports (JSON)
-│   ├── Master_Orchestrator.json
-│   ├── WF1_Ingestion.json
-│   ├── WF2_Cleaning.json
-│   ├── WF3_SQL_Load.json
-│   ├── WF4_Anomaly_Detection.json
-│   └── WF5_Email_Alerts.json
+├── screenshots/             # n8n workflow screenshots
+│   ├── master_orchestrator.png
+│   ├── wf1_ingestion.png
+│   ├── wf2_cleaning.png
+│   ├── wf3_sql_load.png
+│   ├── wf4_anomaly_detection.png
+│   └── wf5_email_alerts.png
 ├── docs/
 │   ├── Anomaly_Detection_Logic.docx
 │   └── DataWeave_Analytics_Overview.pptx
 └── dashboards/
-    └── screenshots/
+    └── screenshots/         # Power BI dashboard screenshots
 ```
 
 ---
 
 ## 🎥 Demo Videos
 
-https://app.clipchamp.com/consumer/editor/?driveId=E980843824AE6AB4&itemId=E980843824AE6AB4%21s47d23e62d4d6412abee8f4dce40e4cb9&folderId=E980843824AE6AB4%21s4d244287850046618ece28c7add497ce
+- **Project Introduction & Master Workflow Overview** — [link]
+- **Power BI Dashboards Walkthrough** — [link]
+
+*(Replace with your Loom links once uploaded)*
+
+---
 
 ## 👥 Team
 
